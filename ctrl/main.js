@@ -260,36 +260,45 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    //Date Navigation
     const currentDateElement = document.getElementById('current-date');
     let currentDate = new Date();
-
-    const updateDateDisplay = () => {
+    const maxDate = new Date();
+    
+    const updateDateDisplay = (user) => {
+        if (!user) {
+            console.log("User is not authenticated.");
+            return;
+        }
+    
         const options = { weekday: 'short', month: 'short', day: 'numeric' };
         const formattedDate = currentDate.toLocaleDateString('en-US', options);
         currentDateElement.textContent = formattedDate;
-
+    
         const formattedDateString = currentDate.toISOString().split('T')[0];
-        const user = auth.currentUser;
-
-        if (user) {
-            getBlocksForDate(user.uid, formattedDateString);
-        } else {
-            console.log("User is not authenticated.");
-        }
+        
+        updateDatabaseWithTodayBlocks(user.uid, formattedDateString);
+        getBlocksForDate(user.uid, formattedDateString);
     };
-
+    
     document.getElementById('prev-date').addEventListener('click', () => {
         currentDate.setDate(currentDate.getDate() - 1);
-        updateDateDisplay();
+        updateDateDisplay(auth.currentUser);
     });
-
+    
     document.getElementById('next-date').addEventListener('click', () => {
-        currentDate.setDate(currentDate.getDate() + 1);
-        updateDateDisplay();
+        if (currentDate < maxDate) {
+            currentDate.setDate(currentDate.getDate() + 1);
+            updateDateDisplay(auth.currentUser);
+        }
     });
-
-    // Load user blocks for a selected date
+    
     const loadUserBlocks = (userId, selectedDate) => {
+        document.querySelectorAll("[data-index]").forEach(block => {
+            block.style.backgroundColor = null;
+            block.dataset.event = "";
+        });
+    
         const blocksRef = collection(db, "users", userId, "assignedBlocks", selectedDate, "blocks");
         getDocs(blocksRef)
             .then(snapshot => {
@@ -300,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const blockData = doc.data();
                         const blockIndex = doc.id;
                         const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
-
+    
                         if (blockElement) {
                             blockElement.style.backgroundColor = blockData.color;
                             blockElement.dataset.event = blockData.event;
@@ -312,8 +321,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Error fetching blocks: ", error);
             });
     };
-
+    
     const getBlocksForDate = (userId, selectedDate) => {
         loadUserBlocks(userId, selectedDate);
     };
+    
+    const updateDatabaseWithTodayBlocks = (userId, selectedDate) => {
+        const blocksRef = collection(db, "users", userId, "assignedBlocks", selectedDate, "blocks");
+        getDocs(blocksRef).then(snapshot => {
+            if (!snapshot.empty) {
+                snapshot.forEach(doc => {
+                    const blockData = doc.data();
+                    const blockIndex = doc.id;
+                    const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
+    
+                    if (blockElement) {
+                        blockElement.style.backgroundColor = blockData.color;
+                        blockElement.dataset.event = blockData.event;
+                    }
+                });
+            }
+        }).catch(error => {
+            console.error("Error updating today's blocks: ", error);
+        });
+    };
+    
+    // Wait for authentication before displaying data
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            updateDateDisplay(user);
+        } else {
+            console.log("User is not authenticated.");
+        }
+    });
+    
 });
