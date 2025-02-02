@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const loadUserBlocks = (userId, selectedDate) => {
         document.querySelectorAll("[data-index]").forEach(block => {
-            block.style.backgroundColor = "";
+            block.style.backgroundColor = null;
             block.dataset.event = "";
         });
     
