@@ -1,20 +1,50 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCnUfHW7ZFMlAr7dCT6rN3hPiACME9hYYA",
+    authDomain: "sandbox-bb9f2.firebaseapp.com",
+    databaseURL: "https://sandbox-bb9f2-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "sandbox-bb9f2",
+    storageBucket: "sandbox-bb9f2.firebasestorage.app",
+    messagingSenderId: "118199686299",
+    appId: "1:118199686299:web:02eef1d189e541eb8aa23e"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+document.addEventListener("DOMContentLoaded", () => {
+    const auth = getAuth(app);
+
+    // Handle authentication state change
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            console.log("User logged in:", user.uid);
+        } else {
+            console.log("No user logged in");
+        }
+    });
+
     const grid = document.querySelector(".grid");
     const table = document.createElement("table");
     table.classList.add("time-grid");
 
+    // Create table header (time slots)
     const headerRow = document.createElement("tr");
-
     for (let hour = 0; hour < 24; hour++) {
         const timeCell = document.createElement("th");
         timeCell.textContent = hour.toString().padStart(2, '0') + ":00";
         headerRow.appendChild(timeCell);
     }
-
     table.appendChild(headerRow);
 
-    const totalRows = Math.ceil(144 / 24);
+    // Create time blocks
     let buttonIndex = 0;
+    const totalRows = Math.ceil(144 / 24); // 144 blocks, 24 per row
     for (let i = 1; i <= totalRows; i++) {
         const row = document.createElement("tr");
 
@@ -22,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const cell = document.createElement("td");
             const button = document.createElement("button");
             button.classList.add("button");
-            button.dataset.index = buttonIndex; // Unique index for each button
+            button.dataset.index = buttonIndex;
             cell.appendChild(button);
             row.appendChild(cell);
             buttonIndex++;
@@ -36,57 +66,57 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedBlocks = new Set();
     let startBlockIndex = null;
 
+    // Event listener for block selection
     const gridItems = document.querySelectorAll('.button');
+    gridItems.forEach(item => {
+        item.style.backgroundColor = null;
+        item.dataset.event = null;
+    });
 
-    // Add selection to blocks
-    function addSelection(item) {
+    // Add and remove block selection
+    const addSelection = item => {
         if (!selectedBlocks.has(item)) {
             selectedBlocks.add(item);
             item.classList.add('highlighted');
         }
-    }
+    };
 
-    // Remove selection from blocks
-    function removeSelection(item) {
+    const removeSelection = item => {
         if (selectedBlocks.has(item)) {
             selectedBlocks.delete(item);
             item.classList.remove('highlighted');
         }
-    }
+    };
 
-    // Logic for mouse down and mouse up
     gridItems.forEach(item => {
-        item.addEventListener('mousedown', (event) => {
+        item.addEventListener('mousedown', event => {
             isMouseDown = true;
-             // Clear previous selections
             addSelection(item);
-            startBlockIndex = parseInt(item.dataset.index); // Store the starting block index
+            startBlockIndex = parseInt(item.dataset.index);
         });
 
         item.addEventListener('mouseover', () => {
             if (isMouseDown) {
                 const currentBlockIndex = parseInt(item.dataset.index);
                 const block = gridItems[currentBlockIndex];
-                
-                // Check if the block is already selected
+
                 if (selectedBlocks.has(block)) {
-                    removeSelection(block); // Unselect the block
+                    removeSelection(block);
                 } else {
-                    addSelection(block); // Add the block to the selection
+                    addSelection(block);
                 }
             }
         });
-        
 
-        item.addEventListener('mouseup', (event) => {
+        item.addEventListener('mouseup', () => {
             if (isMouseDown) {
-                showEventPopup(event);
+                showEventPopup();
             }
             isMouseDown = false;
         });
-        selectedBlocks.clear();
     });
 
+    // Handle global mouseup event to close popup
     document.addEventListener('mouseup', () => {
         if (isMouseDown) {
             showEventPopup();
@@ -94,57 +124,123 @@ document.addEventListener("DOMContentLoaded", function () {
         isMouseDown = false;
     });
 
-    // Event creation logic
-    const newEventBtn = document.getElementById('new-event-btn');
-    const newEventForm = document.getElementById('new-event-form');
-    const createEventBtn = document.getElementById('create-event-btn');
-    const eventsContainer = document.getElementById('events-container');
+    // Event creation form handling
+    const newEventBtn = document.getElementById("new-event-btn");
+    const newEventForm = document.getElementById("new-event-form");
+    const createEventBtn = document.getElementById("create-event-btn");
+    const eventsContainer = document.getElementById("events-container");
 
-    newEventBtn.addEventListener('click', function () {
-        newEventForm.style.display = 'block';
+    const existingEvents = new Set();
+
+    // Show event creation form
+    newEventBtn.addEventListener("click", () => {
+        newEventForm.style.display = "block";
     });
 
-    createEventBtn.addEventListener('click', function () {
-        const eventName = document.getElementById('event-name').value;
-        const eventColor = document.getElementById('event-color').value;
+    // Add event to UI
+    const addEventToUI = event => {
+        if (existingEvents.has(event.name)) return;
 
-        if (eventName && eventColor) {
-            const newEventButton = document.createElement('button');
-            newEventButton.textContent = eventName;
-            newEventButton.style.backgroundColor = eventColor;
-            newEventButton.classList.add('event-button');
+        existingEvents.add(event.name);
 
-            eventsContainer.appendChild(newEventButton);
+        const newEventButton = document.createElement("button");
+        newEventButton.textContent = event.name;
+        newEventButton.style.backgroundColor = event.color;
+        newEventButton.classList.add("event-button");
+        eventsContainer.appendChild(newEventButton);
+    };
+
+    // Create and save event in Firestore
+    createEventBtn.addEventListener("click", async () => {
+        const eventName = document.getElementById("event-name").value.trim();
+        const eventColor = document.getElementById("event-color").value;
+
+        if (!eventName || !eventColor) return;
+
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("User not logged in.");
+            return;
         }
 
-        newEventForm.style.display = 'none';
+        const userId = user.uid;
+
+        if (existingEvents.has(eventName)) {
+            alert("Event already exists!");
+            return;
+        }
+
+        const eventRef = doc(db, "users", userId, "events", eventName);
+        const eventData = { name: eventName, color: eventColor };
+
+        try {
+            await setDoc(eventRef, eventData);
+            console.log("Event stored in Firestore!");
+            addEventToUI(eventData);
+        } catch (error) {
+            console.error("Error storing event:", error);
+        }
+
+        newEventForm.style.display = "none";
     });
 
-    // Event selection popup
+    // Load user events
+    const loadUserEvents = async userId => {
+        const eventsRef = collection(db, "users", userId, "events");
+        const querySnapshot = await getDocs(eventsRef);
+        querySnapshot.forEach(doc => addEventToUI(doc.data()));
+    };
+
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            loadUserEvents(user.uid);
+        } else {
+            console.log("No user logged in.");
+        }
+    });
+
+    // Event popup for assigning events to blocks
     const eventPopup = document.createElement('div');
     eventPopup.classList.add('event-popup');
     document.body.appendChild(eventPopup);
 
-    function showEventPopup(event) {
+    const showEventPopup = () => {
         if (selectedBlocks.size === 0) return;
 
         eventPopup.innerHTML = '';
         const eventButtons = document.querySelectorAll('.event-button');
         if (eventButtons.length === 0) return;
 
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("User not logged in.");
+            return;
+        }
+
+        const userId = user.uid;
+        const currentDate = new Date().toISOString().split('T')[0];
+
         eventButtons.forEach(eventBtn => {
             const eventOption = document.createElement('button');
             eventOption.textContent = eventBtn.textContent;
             eventOption.style.backgroundColor = eventBtn.style.backgroundColor;
 
-            eventOption.addEventListener('click', function () {
-                // Assign event to all selected blocks at once
+            eventOption.addEventListener('click', () => {
                 selectedBlocks.forEach(block => {
                     block.style.backgroundColor = eventBtn.style.backgroundColor;
-                    block.dataset.event = eventBtn.textContent; // Store event name in block
+                    block.dataset.event = eventBtn.textContent;
+
+                    const blockRef = doc(db, "users", userId, "assignedBlocks", currentDate, "blocks", block.dataset.index);
+                    setDoc(blockRef, {
+                        event: eventBtn.textContent,
+                        color: eventBtn.style.backgroundColor
+                    }).then(() => {
+                        console.log("Block assigned successfully!");
+                    }).catch(error => {
+                        console.error("Error saving data:", error);
+                    });
                 });
 
-                // Close the popup after assigning the event
                 selectedBlocks.clear();
                 eventPopup.style.display = 'none';
             });
@@ -155,85 +251,69 @@ document.addEventListener("DOMContentLoaded", function () {
         eventPopup.style.top = `${event.clientY + 10}px`;
         eventPopup.style.left = `${event.clientX + 10}px`;
         eventPopup.style.display = 'block';
-    }
+    };
 
-    document.addEventListener('click', function (event) {
+    // Close popup when clicking outside
+    document.addEventListener('click', event => {
         if (!event.target.classList.contains('button') && !event.target.classList.contains('event-popup')) {
             eventPopup.style.display = 'none';
         }
     });
 
-
-    // Date navigation
     const currentDateElement = document.getElementById('current-date');
     let currentDate = new Date();
 
-    function updateDateDisplay() {
+    const updateDateDisplay = () => {
         const options = { weekday: 'short', month: 'short', day: 'numeric' };
         const formattedDate = currentDate.toLocaleDateString('en-US', options);
         currentDateElement.textContent = formattedDate;
-    }
 
-    document.getElementById('prev-date').addEventListener('click', function () {
+        const formattedDateString = currentDate.toISOString().split('T')[0];
+        const user = auth.currentUser;
+
+        if (user) {
+            getBlocksForDate(user.uid, formattedDateString);
+        } else {
+            console.log("User is not authenticated.");
+        }
+    };
+
+    document.getElementById('prev-date').addEventListener('click', () => {
         currentDate.setDate(currentDate.getDate() - 1);
         updateDateDisplay();
     });
 
-    document.getElementById('next-date').addEventListener('click', function () {
+    document.getElementById('next-date').addEventListener('click', () => {
         currentDate.setDate(currentDate.getDate() + 1);
         updateDateDisplay();
     });
 
-    updateDateDisplay(); // Initial date display
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const currentDateElement = document.getElementById('current-date');
-    let currentDate = new Date();
+    // Load user blocks for a selected date
+    const loadUserBlocks = (userId, selectedDate) => {
+        const blocksRef = collection(db, "users", userId, "assignedBlocks", selectedDate, "blocks");
+        getDocs(blocksRef)
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    console.log("No blocks found for this date");
+                } else {
+                    snapshot.forEach(doc => {
+                        const blockData = doc.data();
+                        const blockIndex = doc.id;
+                        const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
 
-    function updateDateDisplay() {
-        const options = { weekday: 'short', month: 'short', day: 'numeric' };
-        const formattedDate = currentDate.toLocaleDateString('en-US', options);
-        currentDateElement.textContent = formattedDate;
-    }
-
-    document.getElementById('prev-date').addEventListener('click', function () {
-        currentDate.setDate(currentDate.getDate() - 1);
-        updateDateDisplay();
-    });
-
-    document.getElementById('next-date').addEventListener('click', function () {
-        currentDate.setDate(currentDate.getDate() + 1);
-        updateDateDisplay();
-    });
-
-    updateDateDisplay(); // Initial date display
-
-
-    // Function to collect event data (counts and colors)
-    function collectEventData() {
-        const buttons = document.querySelectorAll('.button');
-        const eventData = {};
-
-        buttons.forEach(button => {
-            const event = button.dataset.event;
-            if (event) {
-                if (!eventData[event]) {
-                    eventData[event] = {
-                        count: 0,
-                        color: button.style.backgroundColor // Store the color
-                    };
+                        if (blockElement) {
+                            blockElement.style.backgroundColor = blockData.color;
+                            blockElement.dataset.event = blockData.event;
+                        }
+                    });
                 }
-                eventData[event].count++;
-            }
-        });
+            })
+            .catch(error => {
+                console.error("Error fetching blocks: ", error);
+            });
+    };
 
-        return eventData;
-    }
-
-    // Save event data to localStorage and navigate to analysis.html
-    document.querySelector('.analysis-button').addEventListener('click', function () {
-        const eventData = collectEventData();
-        localStorage.setItem('eventData', JSON.stringify(eventData)); // Store data in localStorage
-        window.location.href = 'analysis.html'; // Navigate to the analysis page
-    });
+    const getBlocksForDate = (userId, selectedDate) => {
+        loadUserBlocks(userId, selectedDate);
+    };
 });
