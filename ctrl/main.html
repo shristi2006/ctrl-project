@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTRL Dashboard</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">CTRL.</div>
+        <div class="icons">
+            <a href="todo.html"><button class="todo-button">TO-DO</button></a>
+            <button class="coldturkey-button">COLD-TURKEY</button>
+            <a href="analysis.html"><button class="analysis-button">ANALYSIS</button></a>
+        </div>
+    </header>
+    
+    <blockquote class="quote">
+        "What are you busy about?"
+    </blockquote>
+
+    <nav class="date-nav">
+        <button class="prev-date" id="prev-date" aria-label="Previous Date">&lt;</button>
+        <button class="current-date" id="current-date" aria-label="Current Date"></button>
+        <button class="next-date" id="next-date" aria-label="Next Date">&gt;</button>
+    </nav>
+
+    <main class="grid">
+        <!-- The grid will be populated dynamically using JavaScript -->
+    </main>
+
+    <section class="event-creation">
+        <button id="new-event-btn">New Event</button>
+        <form id="new-event-form" style="display: none;">
+            <input type="text" id="event-name" placeholder="Event Name" required />
+            <input type="color" id="event-color" required />
+            <button type="button" id="create-event-btn">Create Event</button>
+        </form>
+        <div id="events-container"></div>
+    </section>
+
+    <!-- Event Popup (needed for event selection after drag) -->
+    <div class="event-popup" role="dialog" aria-modal="true"></div>
+
+    <!-- Load JavaScript at the end to ensure the DOM is ready -->
+    <script src="main.js"></script>
+</body>
+</html>

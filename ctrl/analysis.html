@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTRL Analysis</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">CTRL.</div>
+        <div class="icons">
+            <a href="todo.html"><button class="todo-button">TO-DO</button></a>
+            <button class="coldturkey-button">COLD-TURKEY</button>
+            <a href="analysis.html"><button class="analysis-button">ANALYSIS</button></a>
+        </div>
+    </header>
+
+    <blockquote class="quote">
+        "What are you busy about?"
+    </blockquote>
+
+    <main class="grid">
+        <canvas id="pieChart" width="400" height="400"></canvas>
+    </main>
+
+    <script>
+        // Function to generate the pie chart
+        function generatePieChart() {
+            const eventData = JSON.parse(localStorage.getItem('eventData')); // Retrieve data from localStorage
+            if (!eventData) {
+                console.error("No data found for the pie chart.");
+                return;
+            }
+
+            const labels = Object.keys(eventData);
+            const data = labels.map(label => eventData[label].count); // Extract counts
+            const backgroundColors = labels.map(label => eventData[label].color); // Extract colors
+
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            });
+        }
+
+        // Generate the pie chart when the page loads
+        document.addEventListener("DOMContentLoaded", generatePieChart);
+    </script>
+</body>
+</html>

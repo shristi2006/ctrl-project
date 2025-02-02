@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple To-Do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin-bottom: 10px;
+      text-align: center;
+      text-decoration: black;
+      
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-left: 0;
+      display: flex;
+      flex-direction: column; /* Ensures the tasks are aligned vertically */
+    }
+
+    .task-item {
+      display: flex;
+      align-items: left;
+      margin-bottom: 10px;
+      padding-left: 0; /* Remove left padding to align properly */
+    }
+
+    .task-item input[type="checkbox"] {
+      margin-left: 0; /* Align checkbox to the left */
+      margin-right: 10px; /* Add some space between checkbox and text */
+    }
+
+    .task-item input[type="text"] {
+      font-size: 14px;
+      padding: 8px;
+      width: 250px; /* Reduced width to make it more compact */
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .task-input {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .add-btn {
+      cursor: pointer;
+      font-size: 30px;
+      margin-left: 10px;
+      margin-top: 10px;
+      color: #007bff;
+    }
+
+    .add-btn:hover {
+      color: green;
+    }
+
+    .task-input span {
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>To-Do List</h1>
+  <ul id="task-list">
+    <!-- Tasks will appear here -->
+  </ul>
+  <div class="task-input">
+    <span class="add-btn" id="add-task-btn">+</span>
+    <span class="add-btn" id="add-task-line">Add a task</span>
+  </div>
+
+  <script>
+    const taskList = document.getElementById('task-list');
+    const addTaskBtn = document.getElementById('add-task-btn');
+    const addTaskLine = document.getElementById('add-task-line');
+
+    // Function to add a new task
+    function addTask() {
+      const li = document.createElement('li');
+      li.className = 'task-item';
+
+      // Task Checkbox
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+
+      // Task Input Box (for entering task)
+      const inputBox = document.createElement('input');
+      inputBox.type = 'text';
+      inputBox.placeholder = 'Enter task here';
+
+      li.appendChild(checkbox);
+      li.appendChild(inputBox);
+      taskList.appendChild(li);
+
+      // When checkbox is clicked, mark the task as completed by crossing out text
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          inputBox.style.textDecoration = 'line-through';
+          inputBox.style.color = 'gray';
+        } else {
+          inputBox.style.textDecoration = 'none';
+          inputBox.style.color = 'black';
+        }
+      });
+
+      // Deleting task when Backspace is pressed and input is empty
+      inputBox.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && inputBox.value === '') {
+          taskList.removeChild(li); // Remove task on Backspace when input is empty
+        }
+        // Move to next task box when Enter is pressed
+        if (e.key === 'Enter') {
+          const nextInput = inputBox.nextElementSibling;
+          if (nextInput && nextInput.type === 'text') {
+            nextInput.focus(); // Focus on next input box
+          }
+          addTask(); // Add a new task
+          inputBox.value = ''; // Clear the current input box
+        }
+      });
+    }
+
+    // Event Listeners
+    addTaskBtn.addEventListener('click', addTask);
+
+    // Add task on "Add a task" click
+    addTaskLine.addEventListener('click', addTask);
+
+  </script>
+</body>
+</html>
