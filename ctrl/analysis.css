@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f8f8f8;
+    margin: 0;
+    padding: 20px;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.logo {
+    font-size: 55px;
+    font-weight: bold;
+}
+
+.icons {
+    display: flex;
+    gap: 10px;
+}
+
+ .weekly-button, .daily-button {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px;
+    border: 2px solid black;
+}
+
+.daily-button, .weekly-button {
+    background-color: black;
+    color: white;
+}
+
+.weekly-button {
+    background-color: white;
+    color: black;
+}
+
+.quote {
+    font-style: italic;
+    margin: 10px 0;
+    font-size: 20px;
+    color: #666;
+}
+
+.date-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.prev-date, .next-date {
+    background: black;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.current-date {
+    background-color: #f8f8f8;
+    color: black;
+    border: 2px solid black;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 26px;
+    margin: 0 10px;
+}
+#eventChart {
+    max-width: 500px;
+    max-height: 500px;
+}
+.chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

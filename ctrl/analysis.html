@@ -3,60 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTRL Analysis</title>
-    <link rel="stylesheet" href="main.css">
+    <title>Event Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="analysis.css">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnUfHW7ZFMlAr7dCT6rN3hPiACME9hYYA",
+            authDomain: "sandbox-bb9f2.firebaseapp.com",
+            databaseURL: "https://sandbox-bb9f2-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sandbox-bb9f2",
+            storageBucket: "sandbox-bb9f2.firebasestorage.app",
+            messagingSenderId: "118199686299",
+            appId: "1:118199686299:web:02eef1d189e541eb8aa23e"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let pieChart; // To hold the chart instance
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const currentDateElement = document.getElementById('current-date');
+            const prevDateBtn = document.getElementById('prev-date');
+            const nextDateBtn = document.getElementById('next-date');
+            let selectedDate = new Date();
+
+            const updateDateDisplay = () => {
+                currentDateElement.textContent = selectedDate.toISOString().split('T')[0];
+                loadEventData();
+            };
+
+            prevDateBtn.addEventListener('click', () => {
+                selectedDate.setDate(selectedDate.getDate() - 1);
+                updateDateDisplay();
+            });
+
+            nextDateBtn.addEventListener('click', () => {
+                selectedDate.setDate(selectedDate.getDate() + 1);
+                updateDateDisplay();
+            });
+
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    loadEventData();
+                } else {
+                    console.error("User not logged in.");
+                }
+            });
+
+            async function loadEventData() {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const formattedDate = selectedDate.toISOString().split('T')[0];
+                const blocksRef = collection(db, "users", user.uid, "assignedBlocks", formattedDate, "blocks");
+                const querySnapshot = await getDocs(blocksRef);
+
+                let eventCounts = {};
+                let eventColors = {};
+                let assignedBlocks = 0;
+
+                querySnapshot.forEach(doc => {
+                    const { event, color } = doc.data();
+                    if (event) {
+                        eventCounts[event] = (eventCounts[event] || 0) + 1;
+                        eventColors[event] = color;
+                        assignedBlocks++;
+                    }
+                });
+
+                // Calculate unassigned blocks
+                const unassignedBlocks = 144 - assignedBlocks;
+                if (unassignedBlocks > 0) {
+                    eventCounts["Unassigned"] = unassignedBlocks;
+                    eventColors["Unassigned"] = "#d3d3d3"; // Gray color for unassigned blocks
+                }
+
+                renderPieChart(eventCounts, eventColors);
+            }
+
+            function renderPieChart(eventCounts, eventColors) {
+                const ctx = document.getElementById("eventChart").getContext("2d");
+                if (pieChart) pieChart.destroy(); // Destroy previous chart instance
+
+                pieChart = new Chart(ctx, {
+                    type: "pie",
+                    data: {
+                        labels: Object.keys(eventCounts),
+                        datasets: [{
+                            data: Object.values(eventCounts),
+                            backgroundColor: Object.keys(eventCounts).map(event => eventColors[event])
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: "bottom"
+                            }
+                        }
+                    }
+                });
+            }
+
+            updateDateDisplay();
+        });
+    </script>
 </head>
 <body>
     <header class="header">
         <div class="logo">CTRL.</div>
         <div class="icons">
-            <a href="todo.html"><button class="todo-button">TO-DO</button></a>
-            <button class="coldturkey-button">COLD-TURKEY</button>
-            <a href="analysis.html"><button class="analysis-button">ANALYSIS</button></a>
+            <a href="weekly.html"><button class="weekly-button">WEEKLY</button></a>
+            <button class="daily-button">DAILY</button></a>
         </div>
     </header>
-
+    
     <blockquote class="quote">
         "What are you busy about?"
     </blockquote>
 
-    <main class="grid">
-        <canvas id="pieChart" width="400" height="400"></canvas>
-    </main>
+    <nav class="date-nav">
+        <button class="prev-date" id="prev-date" aria-label="Previous Date">&lt;</button>
+        <button class="current-date" id="current-date" aria-label="Current Date"></button>
+        <button class="next-date" id="next-date" aria-label="Next Date">&gt;</button>
+    </nav>
+    <div class="chart"><canvas id="eventChart"></canvas></div>
 
-    <script>
-        // Function to generate the pie chart
-        function generatePieChart() {
-            const eventData = JSON.parse(localStorage.getItem('eventData')); // Retrieve data from localStorage
-            if (!eventData) {
-                console.error("No data found for the pie chart.");
-                return;
-            }
-
-            const labels = Object.keys(eventData);
-            const data = labels.map(label => eventData[label].count); // Extract counts
-            const backgroundColors = labels.map(label => eventData[label].color); // Extract colors
-
-            const ctx = document.getElementById('pieChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: backgroundColors,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                }
-            });
-        }
-
-        // Generate the pie chart when the page loads
-        document.addEventListener("DOMContentLoaded", generatePieChart);
-    </script>
+    
+    
+    <a href="main.html">Back to main page</a>
 </body>
 </html>
