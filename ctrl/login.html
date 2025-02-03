@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,40 @@
     <link rel="stylesheet" href="register.css">
     <script type="module" src="login.js" defer></script>
 </head>
+
 <body>
+    <header class="navbar">
+        <h1 class="app-name">CTRL.</h1>
+    </header>
     <div class="container">
-        <h2>Login</h2>
-        <input type="email" id="email" placeholder="Email" required><br>
-        <input type="password" id="password" placeholder="Password" required><br>
-        <button id= "submit" type="submit">Login</button>
-        <p id="message"></p>
+        <!-- Left Section: Image -->
+        <div class="image-container">
+            <img src="frog.png" alt="Frog Illustration">
+        </div>
+
+        <!-- Right Section: Login Form -->
+        <div class="login-box">
+            <h2>Login to Track your Time</h2>
+
+            <!-- Google Login Button -->
+            <button id="google-login" class="google-login-btn">
+                <img src="google-icon.png" alt="Google Icon"> Continue with Google
+            </button>
+
+            <p class="or-text">or</p>
+
+            <!-- Email & Password Login -->
+            <form id="login-form">
+                <input type="email" id="email" class="input-field" placeholder="Email" required>
+                <input type="password" id="password" class="input-field" placeholder="Password" required>
+                <button id="submit" class="login-btn" type="submit">Log in</button>
+            </form>
+
+            <p class="signup-text">Don't have an account? <a href="register.html">Create one</a></p>
+
+            <p id="message"></p>
+        </div>
     </div>
-    <div class="form"><p>Don't have an account?<a href="register.html">Create one</a></p></div>
 </body>
+
 </html>

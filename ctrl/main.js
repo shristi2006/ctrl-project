@@ -16,19 +16,23 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+let userId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-    const auth = getAuth(app);
-
-    // Handle authentication state change
+    //ensuring that firebase is loaded properly before running code
     onAuthStateChanged(auth, user => {
         if (user) {
-            console.log("User logged in:", user.uid);
+            userId = user.uid;
+            updateDateDisplay(user);
+            loadUserEvents(user.uid);
+            console.log("User logged in:", userId);
         } else {
-            console.log("No user logged in");
+            console.error("No user logged in");
         }
     });
 
+    //table and grid creation ----------------------------------
     const grid = document.querySelector(".grid");
     const table = document.createElement("table");
     table.classList.add("time-grid");
@@ -57,74 +61,94 @@ document.addEventListener("DOMContentLoaded", () => {
             row.appendChild(cell);
             buttonIndex++;
         }
-
         table.appendChild(row);
     }
     grid.appendChild(table);
 
-    let isMouseDown = false;
-    let selectedBlocks = new Set();
-    let startBlockIndex = null;
+    //Date Navigation------------------------------------------------------------------------------
+    const currentDateElement = document.getElementById('current-date');
+    let currentDate = new Date();
+    const maxDate = new Date();
+    let formattedDateString = null;
 
-    // Event listener for block selection
-    const gridItems = document.querySelectorAll('.button');
-    gridItems.forEach(item => {
-        item.style.backgroundColor = null;
-        item.dataset.event = null;
+    const updateDateDisplay = (user) => {
+
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
+        const formattedDate = currentDate.toLocaleDateString('en-US', options);
+        currentDateElement.textContent = formattedDate;
+
+        formattedDateString = currentDate.toISOString().split('T')[0];
+
+        updateDatabaseWithTodayBlocks(user.uid, formattedDateString);
+        getBlocksForDate(user.uid, formattedDateString);
+    };
+
+    document.getElementById('prev-date').addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() - 1);
+        updateDateDisplay(auth.currentUser);
     });
 
-    // Add and remove block selection
-    const addSelection = item => {
-        if (!selectedBlocks.has(item)) {
-            selectedBlocks.add(item);
-            item.classList.add('highlighted');
+    document.getElementById('next-date').addEventListener('click', () => {
+        if (currentDate < maxDate) {
+            currentDate.setDate(currentDate.getDate() + 1);
+            updateDateDisplay(auth.currentUser);
         }
-    };
+    });
 
-    const removeSelection = item => {
-        if (selectedBlocks.has(item)) {
-            selectedBlocks.delete(item);
-            item.classList.remove('highlighted');
-        }
-    };
-
-    gridItems.forEach(item => {
-        item.addEventListener('mousedown', event => {
-            isMouseDown = true;
-            addSelection(item);
-            startBlockIndex = parseInt(item.dataset.index);
+    const loadUserBlocks = (userId, selectedDate) => {
+        document.querySelectorAll("[data-index]").forEach(block => {
+            block.style.backgroundColor = null;
+            block.dataset.event = "";
         });
 
-        item.addEventListener('mouseover', () => {
-            if (isMouseDown) {
-                const currentBlockIndex = parseInt(item.dataset.index);
-                const block = gridItems[currentBlockIndex];
-
-                if (selectedBlocks.has(block)) {
-                    removeSelection(block);
+        const blocksRef = collection(db, "users", userId, "assignedBlocks", selectedDate, "blocks");
+        getDocs(blocksRef)
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    console.log("No blocks found for this date");
                 } else {
-                    addSelection(block);
+                    snapshot.forEach(doc => {
+                        const blockData = doc.data();
+                        const blockIndex = doc.id;
+                        const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
+
+                        if (blockElement) {
+                            blockElement.style.backgroundColor = blockData.color;
+                            blockElement.dataset.event = blockData.event;
+                        }
+                    });
                 }
+            })
+            .catch(error => {
+                console.error("Error fetching blocks: ", error);
+            });
+    };
+
+    const getBlocksForDate = (userId, selectedDate) => {
+        loadUserBlocks(userId, selectedDate);
+    };
+
+    const updateDatabaseWithTodayBlocks = (userId, selectedDate) => {
+        const blocksRef = collection(db, "users", userId, "assignedBlocks", selectedDate, "blocks");
+        getDocs(blocksRef).then(snapshot => {
+            if (!snapshot.empty) {
+                snapshot.forEach(doc => {
+                    const blockData = doc.data();
+                    const blockIndex = doc.id;
+                    const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
+
+                    if (blockElement) {
+                        blockElement.style.backgroundColor = blockData.color;
+                        blockElement.dataset.event = blockData.event;
+                    }
+                });
             }
+        }).catch(error => {
+            console.error("Error updating today's blocks: ", error);
         });
+    };
 
-        item.addEventListener('mouseup', () => {
-            if (isMouseDown) {
-                showEventPopup();
-            }
-            isMouseDown = false;
-        });
-    });
-
-    // Handle global mouseup event to close popup
-    document.addEventListener('mouseup', () => {
-        if (isMouseDown) {
-            showEventPopup();
-        }
-        isMouseDown = false;
-    });
-
-    // Event creation form handling
+    // Event creation--------------------------------------------------------------
     const newEventBtn = document.getElementById("new-event-btn");
     const newEventForm = document.getElementById("new-event-form");
     const createEventBtn = document.getElementById("create-event-btn");
@@ -191,15 +215,70 @@ document.addEventListener("DOMContentLoaded", () => {
         querySnapshot.forEach(doc => addEventToUI(doc.data()));
     };
 
-    onAuthStateChanged(auth, user => {
-        if (user) {
-            loadUserEvents(user.uid);
-        } else {
-            console.log("No user logged in.");
-        }
+    //selection of blocks-----------------------------------------------------
+    let isMouseDown = false;
+    let selectedBlocks = new Set();
+    let startBlockIndex = null;
+
+    // Event listener for block selection
+    const gridItems = document.querySelectorAll('.button');
+    gridItems.forEach(item => {
+        item.style.backgroundColor = null;
+        item.dataset.event = null;
     });
 
-    // Event popup for assigning events to blocks
+    const addSelection = item => {
+        if (!selectedBlocks.has(item)) {
+            selectedBlocks.add(item);
+            item.classList.add('highlighted');
+        }
+    };
+
+    const removeSelection = item => {
+        if (selectedBlocks.has(item)) {
+            selectedBlocks.delete(item);
+            item.classList.remove('highlighted');
+        }
+    };
+
+    gridItems.forEach(item => {
+        item.addEventListener('mousedown', event => {
+            isMouseDown = true;
+            addSelection(item);
+            startBlockIndex = parseInt(item.dataset.index);
+        });
+
+        item.addEventListener('mouseover', () => {
+            if (isMouseDown) {
+                const currentBlockIndex = parseInt(item.dataset.index);
+                const block = gridItems[currentBlockIndex];
+
+                if (selectedBlocks.has(block)) {
+                    removeSelection(block);
+                } else {
+                    addSelection(block);
+                }
+            }
+        });
+
+        item.addEventListener('mouseup', () => {
+            if (isMouseDown) {
+                showEventPopup();
+            }
+            isMouseDown = false;
+        });
+    });
+
+    //mouseup event to close popup
+    document.addEventListener('mouseup', () => {
+        if (isMouseDown) {
+            showEventPopup();
+        }
+        isMouseDown = false;
+    });
+
+
+    // Event popup for assigning events to blocks-------------------------------------------------------
     const eventPopup = document.createElement('div');
     eventPopup.classList.add('event-popup');
     document.body.appendChild(eventPopup);
@@ -211,15 +290,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const eventButtons = document.querySelectorAll('.event-button');
         if (eventButtons.length === 0) return;
 
-        const user = auth.currentUser;
-        if (!user) {
-            console.error("User not logged in.");
-            return;
-        }
-
-        const userId = user.uid;
-        const currentDate = new Date().toISOString().split('T')[0];
-
         eventButtons.forEach(eventBtn => {
             const eventOption = document.createElement('button');
             eventOption.textContent = eventBtn.textContent;
@@ -229,8 +299,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 selectedBlocks.forEach(block => {
                     block.style.backgroundColor = eventBtn.style.backgroundColor;
                     block.dataset.event = eventBtn.textContent;
+                    block.classList.remove('highlighted');
 
-                    const blockRef = doc(db, "users", userId, "assignedBlocks", currentDate, "blocks", block.dataset.index);
+                    const blockRef = doc(db, "users", userId, "assignedBlocks", formattedDateString, "blocks", block.dataset.index);
                     setDoc(blockRef, {
                         event: eventBtn.textContent,
                         color: eventBtn.style.backgroundColor
@@ -259,100 +330,4 @@ document.addEventListener("DOMContentLoaded", () => {
             eventPopup.style.display = 'none';
         }
     });
-
-    //Date Navigation
-    const currentDateElement = document.getElementById('current-date');
-    let currentDate = new Date();
-    const maxDate = new Date();
-    
-    const updateDateDisplay = (user) => {
-        if (!user) {
-            console.log("User is not authenticated.");
-            return;
-        }
-    
-        const options = { weekday: 'short', month: 'short', day: 'numeric' };
-        const formattedDate = currentDate.toLocaleDateString('en-US', options);
-        currentDateElement.textContent = formattedDate;
-    
-        const formattedDateString = currentDate.toISOString().split('T')[0];
-        
-        updateDatabaseWithTodayBlocks(user.uid, formattedDateString);
-        getBlocksForDate(user.uid, formattedDateString);
-    };
-    
-    document.getElementById('prev-date').addEventListener('click', () => {
-        currentDate.setDate(currentDate.getDate() - 1);
-        updateDateDisplay(auth.currentUser);
-    });
-    
-    document.getElementById('next-date').addEventListener('click', () => {
-        if (currentDate < maxDate) {
-            currentDate.setDate(currentDate.getDate() + 1);
-            updateDateDisplay(auth.currentUser);
-        }
-    });
-    
-    const loadUserBlocks = (userId, selectedDate) => {
-        document.querySelectorAll("[data-index]").forEach(block => {
-            block.style.backgroundColor = null;
-            block.dataset.event = "";
-        });
-    
-        const blocksRef = collection(db, "users", userId, "assignedBlocks", selectedDate, "blocks");
-        getDocs(blocksRef)
-            .then(snapshot => {
-                if (snapshot.empty) {
-                    console.log("No blocks found for this date");
-                } else {
-                    snapshot.forEach(doc => {
-                        const blockData = doc.data();
-                        const blockIndex = doc.id;
-                        const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
-    
-                        if (blockElement) {
-                            blockElement.style.backgroundColor = blockData.color;
-                            blockElement.dataset.event = blockData.event;
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching blocks: ", error);
-            });
-    };
-    
-    const getBlocksForDate = (userId, selectedDate) => {
-        loadUserBlocks(userId, selectedDate);
-    };
-    
-    const updateDatabaseWithTodayBlocks = (userId, selectedDate) => {
-        const blocksRef = collection(db, "users", userId, "assignedBlocks", selectedDate, "blocks");
-        getDocs(blocksRef).then(snapshot => {
-            if (!snapshot.empty) {
-                snapshot.forEach(doc => {
-                    const blockData = doc.data();
-                    const blockIndex = doc.id;
-                    const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
-    
-                    if (blockElement) {
-                        blockElement.style.backgroundColor = blockData.color;
-                        blockElement.dataset.event = blockData.event;
-                    }
-                });
-            }
-        }).catch(error => {
-            console.error("Error updating today's blocks: ", error);
-        });
-    };
-    
-    // Wait for authentication before displaying data
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            updateDateDisplay(user);
-        } else {
-            console.log("User is not authenticated.");
-        }
-    });
-    
 });
