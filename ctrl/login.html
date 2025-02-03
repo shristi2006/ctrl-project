@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,29 @@
     <link rel="stylesheet" href="register.css">
     <script type="module" src="login.js" defer></script>
 </head>
+
 <body>
     <div class="container">
         <h2>Login</h2>
-        <input type="email" id="email" placeholder="Email" required><br>
-        <input type="password" id="password" placeholder="Password" required><br>
-        <button id= "submit" type="submit">Login</button>
+
+        <!-- Email and password login section -->
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Email" required><br> <br>
+            <input type="password" id="password" placeholder="Password" required><br> <br>
+            <button id="submit" type="submit">Login</button>
+        </form>
+
+        <div class="form">
+            <p>Don't have an account? <a href="register.html">Create one</a></p>
+        </div>
+        <!-- Google login as an alternative choice -->
+        <div class="alternative-login">
+            <p>or</p>
+            <button id="google-login" class="google-login-btn">Continue with Google</button>
+        </div>
+
         <p id="message"></p>
     </div>
-    <div class="form"><p>Don't have an account?<a href="register.html">Create one</a></p></div>
 </body>
+
 </html>

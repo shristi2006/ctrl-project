@@ -5,16 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Account</title>
     <link rel="stylesheet" href="register.css">
-    <script type="module" src="register.js" defer></script>
+    
 </head>
 <body>
     <div class="container">
         <h2>Register</h2>
-        <input type="email" id="email" placeholder="Email" required><br>
-        <input type="password" id="password" placeholder="Password" required><br>
-        <button id= "submit" type="submit">Create account</button>
+        
+        <!-- Email and password registration section -->
+        <form id="register-form">
+            <input type="email" id="email" placeholder="Email" required><br> <br>
+            <input type="password" id="password" placeholder="Password" required><br> <br>
+            <button id="submit" type="submit">Create account</button>
+        </form>
+
+        <!-- Already have an account? -->
+        <div class="form">
+            <p>Already have an account? <a href="login.html">Login into an account</a></p>
+        </div>
+
         <p id="message"></p>
     </div>
-    <div class="form"><p>Already have an account?<a href="login.html">Login into an account</a></p></div>
+    <script type="module" src="register.js" defer></script>
 </body>
-</html> 
+</html>
