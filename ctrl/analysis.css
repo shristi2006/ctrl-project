@@ -5,6 +5,10 @@ body {
     margin: 0;
     padding: 20px;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> version-5
 .header {
     display: flex;
     justify-content: space-between;
@@ -22,7 +26,12 @@ body {
     gap: 10px;
 }
 
+<<<<<<< HEAD
  .weekly-button, .daily-button {
+=======
+.weekly-button,
+.daily-button {
+>>>>>>> version-5
     padding: 10px 20px;
     border: none;
     cursor: pointer;
@@ -31,7 +40,12 @@ body {
     border: 2px solid black;
 }
 
+<<<<<<< HEAD
 .daily-button, .weekly-button {
+=======
+.daily-button,
+.weekly-button {
+>>>>>>> version-5
     background-color: black;
     color: white;
 }
@@ -55,7 +69,12 @@ body {
     margin: 20px 0;
 }
 
+<<<<<<< HEAD
 .prev-date, .next-date {
+=======
+.prev-date,
+.next-date {
+>>>>>>> version-5
     background: black;
     color: white;
     border: none;
@@ -74,10 +93,18 @@ body {
     font-size: 26px;
     margin: 0 10px;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> version-5
 #eventChart {
     max-width: 500px;
     max-height: 500px;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> version-5
 .chart {
     display: flex;
     justify-content: center;

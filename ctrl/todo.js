@@ -24,35 +24,30 @@ const todoList = document.getElementById('todo-list');
 let userId = null;
 let todoRef = null;
 
-// Check if the user is logged in
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         userId = user.uid;
         todoRef = collection(db, 'users', userId, 'todolist');
         console.log('User logged in:', userId);
 
-        // Load existing tasks from Firestore
         await loadTasks();
     } else {
         console.log('User not logged in');
-        // Optionally, hide the todo list or show a login prompt
         todoList.innerHTML = "<p>Please log in to view your to-do list.</p>";
     }
 });
 
-// Load existing tasks from Firestore when the page loads
 async function loadTasks() {
-    if (!userId) return; // No user logged in, skip loading tasks
+    if (!userId) return;
 
     const querySnapshot = await getDocs(todoRef);
     querySnapshot.forEach((doc) => {
         const task = doc.data();
-        addTaskToUI(task, doc.id); // Add task to the UI
+        addTaskToUI(task, doc.id); 
     });
 }
 
-// Add a new task to the Firestore and the UI
-addButton.addEventListener('click', async function() {
+addButton.addEventListener('click', async function () {
     if (!userId) {
         console.error("User is not logged in.");
         return;
@@ -67,30 +62,26 @@ addButton.addEventListener('click', async function() {
             completed: false,
         };
 
-        // Add task to Firestore
         const taskDocRef = await addDoc(todoRef, taskData);
         const taskId = taskDocRef.id;
 
-        // Add task to UI
         addTaskToUI(taskData, taskId);
 
-        inputField.value = ''; // Clear the input field
+        inputField.value = '';
     }
 });
 
-// Function to create and append task to UI
 function addTaskToUI(taskData, taskId) {
     const li = document.createElement('li');
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
 
-    // Check if the task is completed
     if (taskData.completed) {
         checkbox.checked = true;
         li.classList.add('completed');
     }
 
-    checkbox.addEventListener('change', async function() {
+    checkbox.addEventListener('change', async function () {
         if (checkbox.checked) {
             li.classList.add('completed');
             await updateTaskStatus(taskId, true);
@@ -111,9 +102,9 @@ function addTaskToUI(taskData, taskId) {
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
     deleteButton.classList.add('delete-btn');
-    deleteButton.addEventListener('click', async function() {
+    deleteButton.addEventListener('click', async function () {
         await deleteTask(taskId);
-        li.remove(); // Remove task from UI
+        li.remove();
     });
 
     li.appendChild(checkbox);
@@ -123,20 +114,17 @@ function addTaskToUI(taskData, taskId) {
     todoList.appendChild(li);
 }
 
-// Update task status in Firestore (completed or not)
 async function updateTaskStatus(taskId, completed) {
     const taskRef = doc(db, 'users', userId, 'todolist', taskId);
     await setDoc(taskRef, { completed: completed }, { merge: true });
 }
 
-// Delete task from Firestore
 async function deleteTask(taskId) {
     const taskRef = doc(db, 'users', userId, 'todolist', taskId);
     await deleteDoc(taskRef);
 }
 
-// Allow adding tasks by pressing 'Enter'
-inputField.addEventListener('keydown', function(event) {
+inputField.addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
         addButton.click();
     }
