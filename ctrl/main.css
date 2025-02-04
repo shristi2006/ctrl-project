@@ -56,7 +56,8 @@ body {
     margin: 20px 0;
 }
 
-.prev-date, .next-date {
+.prev-date,
+.next-date {
     background: black;
     color: white;
     border: none;
@@ -89,7 +90,8 @@ body {
     border-collapse: collapse;
 }
 
-.time-grid th, .time-grid td {
+.time-grid th,
+.time-grid td {
     padding: 8px;
     text-align: center;
     border: 1px solid #ddd;
@@ -113,10 +115,9 @@ body {
 }
 
 .highlighted {
-    background-color: grey; 
+    background-color: grey;
 }
 
-/* Popup for event selection */
 .event-popup {
     display: none;
     position: absolute;
@@ -193,6 +194,50 @@ body {
     justify-content: flex-start;
 }
 
+.event-item {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+}
+
+.event-button {
+    position: relative;
+    padding: 10px 15px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 120px;
+}
+
+.event-name {
+    flex-grow: 1;
+    text-align: left;
+    padding-right: 10px;
+}
+
+.delete-event-btn {
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-event-btn:hover {
+    color: #ffdddd;
+}
+
 .event-button {
     padding: 12px 24px;
     border: none;
@@ -201,6 +246,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .event-edit-popup {
     position: fixed;
     top: 50%;
@@ -220,7 +266,8 @@ body {
     gap: 10px;
 }
 
-#save-event-edit, #cancel-event-edit {
+#save-event-edit,
+#cancel-event-edit {
     padding: 10px;
     border: none;
     border-radius: 5px;

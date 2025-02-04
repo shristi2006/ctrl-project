@@ -1,4 +1,3 @@
-/* General Styles */
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +5,6 @@
     font-family: Arial, sans-serif;
 }
 
-/* Body Styling */
 body {
     display: flex;
     align-items: center;
@@ -14,7 +12,7 @@ body {
     height: 100vh;
     background-color: #ffffff;
 }
-/* Navbar */
+
 .navbar {
     position: absolute;
     top: 20px;
@@ -27,7 +25,6 @@ body {
     color: black;
 }
 
-/* Main Container */
 .container {
     display: flex;
     align-items: center;
@@ -36,7 +33,6 @@ body {
     max-width: 1000px;
 }
 
-/* Left Section: Image */
 .image-container {
     width: 50%;
     display: flex;
@@ -45,12 +41,10 @@ body {
 }
 
 .image-container img {
-    width: 150%;  /* Adjust width for full scaling */
-    max-width: 700px; /* Increased max size */
+    width: 150%;
+    max-width: 700px;
 }
 
-
-/* Right Section: Login Form */
 .login-box {
     width: 40%;
     text-align: center;
@@ -58,10 +52,10 @@ body {
     background: white;
     border-radius: 20px;
     border: 1px solid black;
-    
+
 }
 
-/* Logo & Heading */
+
 h1 {
     font-size: 40px;
     font-weight: bold;
@@ -74,7 +68,6 @@ h2 {
     color: #333;
 }
 
-/* Google Login Button */
 .google-login-btn {
     display: flex;
     align-items: center;
@@ -97,13 +90,11 @@ h2 {
     background-color: #f1f1f1;
 }
 
-/* Separator */
 .or-text {
     margin: 15px 0;
     color: #777;
 }
 
-/* Input Fields */
 .input-field {
     width: 100%;
     padding: 12px;
@@ -114,7 +105,6 @@ h2 {
     background-color: #e6e6e6;
 }
 
-/* Login Button */
 .login-btn {
     width: 100%;
     padding: 12px;
@@ -130,7 +120,6 @@ h2 {
     background-color: #333;
 }
 
-/* Signup Text */
 .signup-text {
     margin-top: 15px;
     font-size: 14px;
@@ -142,7 +131,6 @@ h2 {
     color: black;
 }
 
-/* Responsive Design */
 @media (max-width: 800px) {
     .container {
         flex-direction: column;

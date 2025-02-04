@@ -16,7 +16,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Function to handle user data in Firestore
+//checks data in firebase
 async function handleUserData(user) {
     const userRef = doc(db, "users", user.uid);
     try {
@@ -36,7 +36,7 @@ async function handleUserData(user) {
     }
 }
 
-// Email/Password Login
+//login using email and password
 const submit = document.getElementById('submit');
 if (submit) {
     submit.addEventListener("click", async function (event) {
@@ -58,7 +58,7 @@ if (submit) {
     console.error("Error: Login submit button not found!");
 }
 
-// Google Login
+//continue with google login
 const googleLoginButton = document.getElementById('google-login');
 if (googleLoginButton) {
     googleLoginButton.addEventListener("click", async function (event) {
@@ -79,7 +79,7 @@ if (googleLoginButton) {
     console.error("Error: Google login button not found!");
 }
 
-// Monitor user authentication state
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("User is signed in:", user.uid);

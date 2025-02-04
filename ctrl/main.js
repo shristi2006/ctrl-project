@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
-// Firebase configuration
+// firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCnUfHW7ZFMlAr7dCT6rN3hPiACME9hYYA",
     authDomain: "sandbox-bb9f2.firebaseapp.com",
@@ -13,7 +13,7 @@ const firebaseConfig = {
     appId: "1:118199686299:web:02eef1d189e541eb8aa23e"
 };
 
-// Initialize Firebase
+// initialize firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -32,12 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    //table and grid creation ----------------------------------
+    //table and grid creation -----------------------------------------------------------------------------------------------------------
     const grid = document.querySelector(".grid");
     const table = document.createElement("table");
     table.classList.add("time-grid");
 
-    // Create table header (time slots)
     const headerRow = document.createElement("tr");
     for (let hour = 0; hour < 24; hour++) {
         const timeCell = document.createElement("th");
@@ -46,9 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     table.appendChild(headerRow);
 
-    // Create time blocks
     let buttonIndex = 0;
-    const totalRows = Math.ceil(144 / 24); // 144 blocks, 24 per row
+    const totalRows = Math.ceil(144 / 24); 
     for (let i = 1; i <= totalRows; i++) {
         const row = document.createElement("tr");
 
@@ -65,29 +63,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     grid.appendChild(table);
 
-    //Date Navigation------------------------------------------------------------------------------
+    //date navigation------------------------------------------------------------------------------------------------------------------------
     const currentDateElement = document.getElementById('current-date');
     let currentDate = new Date();
     const maxDate = new Date();
-    let formattedDateString = null;
+    let formattedDateString = null; //stores date in yyyy-mm-dd format
 
     const updateDateDisplay = (user) => {
 
         const options = { weekday: 'short', month: 'short', day: 'numeric' };
         const formattedDate = currentDate.toLocaleDateString('en-US', options);
         currentDateElement.textContent = formattedDate;
-
         formattedDateString = currentDate.toISOString().split('T')[0];
-
         updateDatabaseWithTodayBlocks(user.uid, formattedDateString);
         getBlocksForDate(user.uid, formattedDateString);
     };
 
+    //shows previous date
     document.getElementById('prev-date').addEventListener('click', () => {
         currentDate.setDate(currentDate.getDate() - 1);
         updateDateDisplay(auth.currentUser);
     });
 
+    //shows next date with max date being today
     document.getElementById('next-date').addEventListener('click', () => {
         if (currentDate < maxDate) {
             currentDate.setDate(currentDate.getDate() + 1);
@@ -95,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    //loads user blocks for selected date
     const loadUserBlocks = (userId, selectedDate) => {
         document.querySelectorAll("[data-index]").forEach(block => {
             block.style.backgroundColor = null;
@@ -111,7 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         const blockData = doc.data();
                         const blockIndex = doc.id;
                         const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
-
                         if (blockElement) {
                             blockElement.style.backgroundColor = blockData.color;
                             blockElement.dataset.event = blockData.event;
@@ -136,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const blockData = doc.data();
                     const blockIndex = doc.id;
                     const blockElement = document.querySelector(`[data-index='${blockIndex}']`);
-
                     if (blockElement) {
                         blockElement.style.backgroundColor = blockData.color;
                         blockElement.dataset.event = blockData.event;
@@ -148,33 +145,50 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // Event creation--------------------------------------------------------------
+    // creating and deleting an event-----------------------------------------------------------------------------------------------------------
     const newEventBtn = document.getElementById("new-event-btn");
     const newEventForm = document.getElementById("new-event-form");
     const createEventBtn = document.getElementById("create-event-btn");
     const eventsContainer = document.getElementById("events-container");
-
     const existingEvents = new Set();
 
-    // Show event creation form
     newEventBtn.addEventListener("click", () => {
         newEventForm.style.display = "block";
     });
 
-    // Add event to UI
-    const addEventToUI = event => {
-        if (existingEvents.has(event.name)) return;
+    //creates an event block in the UI
+    const addEventToUI = (event) => {
+        if (existingEvents.has(event.name)) return; //doesn't add the same event twice
 
         existingEvents.add(event.name);
 
-        const newEventButton = document.createElement("button");
-        newEventButton.textContent = event.name;
-        newEventButton.style.backgroundColor = event.color;
-        newEventButton.classList.add("event-button");
-        eventsContainer.appendChild(newEventButton);
+        const eventDiv = document.createElement("div");
+        eventDiv.classList.add("event-item");
+
+        const eventButton = document.createElement("button");
+        eventButton.classList.add("event-button");
+        eventButton.style.backgroundColor = event.color;
+
+        const eventNameSpan = document.createElement("span");
+        eventNameSpan.textContent = event.name;
+        eventNameSpan.classList.add("event-name");
+
+        const deleteButton = document.createElement("span");
+        deleteButton.innerHTML = "&times;"; // unicode for cross
+        deleteButton.classList.add("delete-event-btn");
+
+        deleteButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteEvent(event.name);
+        });
+
+        eventButton.appendChild(eventNameSpan);
+        eventButton.appendChild(deleteButton);
+        eventDiv.appendChild(eventButton);
+        eventsContainer.appendChild(eventDiv);
     };
 
-    // Create and save event in Firestore
+    // adding the event to firestore
     createEventBtn.addEventListener("click", async () => {
         const eventName = document.getElementById("event-name").value.trim();
         const eventColor = document.getElementById("event-color").value;
@@ -208,19 +222,48 @@ document.addEventListener("DOMContentLoaded", () => {
         newEventForm.style.display = "none";
     });
 
-    // Load user events
+    // deleting the event from firestore
+    const deleteEvent = async (eventName) => {
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("User not logged in.");
+            return;
+        }
+
+        const userId = user.uid;
+        const eventRef = doc(db, "users", userId, "events", eventName);
+
+        try {
+            await deleteDoc(eventRef);
+            console.log(`Event "${eventName}" deleted from Firestore`);
+            existingEvents.delete(eventName);
+            document.querySelectorAll(".event-item").forEach(eventDiv => {
+                if (eventDiv.querySelector(".event-name").textContent === eventName) {
+                    eventDiv.remove();
+                }
+            });
+            loadUserEvents(userId);
+        } catch (error) {
+            console.error("Error deleting event:", error);
+        }
+    };
+
+    //loading user events from firestore
     const loadUserEvents = async userId => {
+
         const eventsRef = collection(db, "users", userId, "events");
         const querySnapshot = await getDocs(eventsRef);
+
+        existingEvents.clear();
         querySnapshot.forEach(doc => addEventToUI(doc.data()));
     };
 
-    //selection of blocks-----------------------------------------------------
+
+    //selection of blocks---------------------------------------------------------------------------------------------------------------
     let isMouseDown = false;
     let selectedBlocks = new Set();
     let startBlockIndex = null;
 
-    // Event listener for block selection
     const gridItems = document.querySelectorAll('.button');
     gridItems.forEach(item => {
         item.style.backgroundColor = null;
@@ -242,12 +285,14 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     gridItems.forEach(item => {
+        //mousedown event to track when mouse is clicked down
         item.addEventListener('mousedown', event => {
             isMouseDown = true;
             addSelection(item);
             startBlockIndex = parseInt(item.dataset.index);
         });
 
+        //mouseover event to track when mouse is dragged over the grid
         item.addEventListener('mouseover', () => {
             if (isMouseDown) {
                 const currentBlockIndex = parseInt(item.dataset.index);
@@ -261,6 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        //mouseup event to track when mouse is released
         item.addEventListener('mouseup', () => {
             if (isMouseDown) {
                 showEventPopup();
@@ -269,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    //mouseup event to close popup
+    //handles mouse release anywhere
     document.addEventListener('mouseup', () => {
         if (isMouseDown) {
             showEventPopup();
@@ -278,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // Event popup for assigning events to blocks-------------------------------------------------------
+    // Event popup for assigning events to blocks----------------------------------------------------------------------------------------
     const eventPopup = document.createElement('div');
     eventPopup.classList.add('event-popup');
     document.body.appendChild(eventPopup);
@@ -324,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
         eventPopup.style.display = 'block';
     };
 
-    // Close popup when clicking outside
+    // close popup when clicking outside
     document.addEventListener('click', event => {
         if (!event.target.classList.contains('button') && !event.target.classList.contains('event-popup')) {
             eventPopup.style.display = 'none';
