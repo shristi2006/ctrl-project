@@ -56,8 +56,7 @@ body {
     margin: 20px 0;
 }
 
-.prev-date,
-.next-date {
+.prev-date, .next-date {
     background: black;
     color: white;
     border: none;
@@ -90,8 +89,7 @@ body {
     border-collapse: collapse;
 }
 
-.time-grid th,
-.time-grid td {
+.time-grid th, .time-grid td {
     padding: 8px;
     text-align: center;
     border: 1px solid #ddd;
@@ -246,10 +244,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> version-5
 .event-edit-popup {
     position: fixed;
     top: 50%;
@@ -269,12 +264,7 @@ body {
     gap: 10px;
 }
 
-<<<<<<< HEAD
 #save-event-edit, #cancel-event-edit {
-=======
-#save-event-edit,
-#cancel-event-edit {
->>>>>>> version-5
     padding: 10px;
     border: none;
     border-radius: 5px;
@@ -289,8 +279,4 @@ body {
 #cancel-event-edit {
     background-color: #dc3545;
     color: white;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> version-5
