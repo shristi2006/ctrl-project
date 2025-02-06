@@ -23,7 +23,7 @@ body {
     gap: 10px;
 }
 
-.todo-button, .coldturkey-button, .analysis-button {
+.todo-button, .coldturkey-button, .analysis-button, .logout-button {
     padding: 10px 20px;
     border: none;
     cursor: pointer;
@@ -32,11 +32,15 @@ body {
     border: 2px solid black;
 }
 
-.todo-button, .analysis-button , .coldturkey-button{
+.todo-button, .analysis-button {
     background-color: black;
     color: white;
 }
 
+.coldturkey-button {
+    background-color: white;
+    color: black;
+}
 
 .quote {
     font-style: italic;
