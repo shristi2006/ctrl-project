@@ -32,15 +32,11 @@ body {
     border: 2px solid black;
 }
 
-.todo-button, .analysis-button {
+.todo-button, .analysis-button , .coldturkey-button{
     background-color: black;
     color: white;
 }
 
-.coldturkey-button {
-    background-color: white;
-    color: black;
-}
 
 .quote {
     font-style: italic;

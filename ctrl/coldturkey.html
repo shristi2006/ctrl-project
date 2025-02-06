@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cold Turkey Mode</title>
+  <link rel="stylesheet" href="coldturkey.css">
+</head>
+<body>
+    
+  <div id="timer-container">
+    <div id="timer-box">
+      <img src="time.png" alt="Timer Image" id="timer-image">
+      <div id="time-display">00:00:00</div>
+      <input type="number" id="set-hours" placeholder="Hours" min="0">
+      <input type="number" id="set-minutes" placeholder="Minutes" min="0" max="59">
+      <input type="number" id="set-seconds" placeholder="Seconds" min="0" max="59">
+      <button id="start-timer">Start Timer</button>
+      <div id="block-message">Focus Mode: Blocked</div>
+    </div>
+  </div>
+
+  <img id="end-image" src="celebrates.png" alt="Time over!" style="display: none;">
+
+  
+
+  <script src="coldturkey.js"></script>
+</body>
+</html>

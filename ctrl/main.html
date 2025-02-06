@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CTRL Dashboard</title>
     <link rel="stylesheet" href="main.css">
 </head>
-
 <body>
     <header class="header">
         <div class="logo">CTRL.</div>
         <div class="icons">
             <a href="todo.html"><button class="todo-button">TO-DO</button></a>
-            <button class="coldturkey-button">COLD-TURKEY</button>
+            <a href="coldturkey.html"><button class="coldturkey-button" id="coldturkey">COLD-TURKEY</button></a>
+            <script src="coldturkey.js"></script>
             <a href="analysis.html"><button class="analysis-button">ANALYSIS</button></a>
         </div>
     </header>
-
+    
     <blockquote class="quote">
         "What are you busy about?"
     </blockquote>
@@ -42,8 +41,10 @@
         <div id="events-container"></div>
     </section>
 
+    <!-- Event Popup (needed for event selection after drag) -->
     <div class="event-popup" role="dialog" aria-modal="true"></div>
+
+    <!-- Load JavaScript at the end to ensure the DOM is ready -->
     <script type="module" src="main.js"></script>
 </body>
-
 </html>
