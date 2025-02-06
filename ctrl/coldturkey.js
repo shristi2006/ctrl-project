@@ -11,7 +11,6 @@ const minutesInput = document.getElementById('set-minutes');
 const secondsInput = document.getElementById('set-seconds');
 const blockMessage = document.getElementById('block-message');
 const endImage = document.getElementById('end-image');
-const endSound = document.getElementById('end-sound');
 
 startButton.addEventListener('click', startTimer);
 document.addEventListener("fullscreenchange", handleFullScreenChange);
@@ -45,10 +44,10 @@ function startTimer() {
         blockPage();
         enterFullScreen();
 
-        if (remainingTime > 0) {
-            endTime = Date.now() + (remainingTime * 1000);
-        } else {
+        if (remainingTime === 0) {
             endTime = Date.now() + (totalSeconds * 1000);
+        } else {
+            endTime = Date.now() + (remainingTime * 1000);
         }
 
         updateDisplay();
@@ -63,6 +62,7 @@ function updateDisplay() {
     if (timeLeft <= 0) {
         clearInterval(timerInterval);
         timeDisplay.textContent = "00:00:00";
+        remainingTime = 0; // Reset remaining time
         timerFinished();
         return;
     }
@@ -82,18 +82,15 @@ function timerFinished() {
     startButton.disabled = false;
 
     if (blockMessage) blockMessage.style.display = 'none';
-    if (endImage) endImage.style.display = 'block';
 
-    if (endSound) {
-        endSound.play().catch(err => console.log("Audio play error:", err));
-    }
+    setTimeout(() => {
+        if (endImage) endImage.style.display = 'block';
 
-    setTimeout(function() {
-        if (endImage) endImage.style.display = 'none';  // Hide the image
-        if (backdrop) backdrop.style.display = 'none'; // Hide the backdrop
-    }, 4000); // 4 seconds
+        setTimeout(() => {
+            if (endImage) endImage.style.display = 'none';  // Hide the image after 4 seconds
+        }, 4000);
+    }, 10);
 }
-
 
 function blockPage() {
     // Your existing blockPage function
