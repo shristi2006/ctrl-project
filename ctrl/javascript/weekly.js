@@ -2,7 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebas
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
-// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCnUfHW7ZFMlAr7dCT6rN3hPiACME9hYYA",
     authDomain: "sandbox-bb9f2.firebaseapp.com",
@@ -13,91 +12,110 @@ const firebaseConfig = {
     appId: "1:118199686299:web:02eef1d189e541eb8aa23e"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+let barChart;
 
-// Get UI elements
-const weekPicker = document.getElementById("week-picker");
-const analysisChartCanvas = document.getElementById("analysis-chart");
-let chart = null;
+document.addEventListener("DOMContentLoaded", () => {
+    const currentWeekElement = document.getElementById('current-week');
+    const prevWeekBtn = document.getElementById('prev-week');
+    const nextWeekBtn = document.getElementById('next-week');
+    let selectedDate = new Date();
 
-// Event listener for week selection
-weekPicker.addEventListener('change', () => {
-    const selectedWeek = weekPicker.value;
-    if (selectedWeek) {
-        loadWeeklyAnalysis(selectedWeek);
-    }
-});
+    const updateWeekDisplay = () => {
+        const startOfWeek = new Date(selectedDate);
+        startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay()); // Set to Sunday
 
-// Load weekly analysis data
-const loadWeeklyAnalysis = async (selectedWeek) => {
-    const user = auth.currentUser;
-    if (!user) {
-        console.error("User is not authenticated.");
-        return;
-    }
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
 
-    const userId = user.uid;
+        currentWeekElement.textContent = `${startOfWeek.toISOString().split('T')[0]} - ${endOfWeek.toISOString().split('T')[0]}`;
+        loadWeeklyData(startOfWeek, endOfWeek);
+    };
 
-    // Calculate start and end dates for the selected week
-    const startOfWeek = new Date(selectedWeek + "-01"); // First day of the selected week
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // Last day of the selected week
+    prevWeekBtn.addEventListener('click', () => {
+        selectedDate.setDate(selectedDate.getDate() - 7);
+        updateWeekDisplay();
+    });
 
-    const blocksRef = collection(db, "users", userId, "assignedBlocks");
-    const querySnapshot = await getDocs(blocksRef);
+    nextWeekBtn.addEventListener('click', () => {
+        selectedDate.setDate(selectedDate.getDate() + 7);
+        updateWeekDisplay();
+    });
 
-    const eventTimes = {}; // Store total time per event (in minutes)
-
-    querySnapshot.forEach(doc => {
-        const blockData = doc.data();
-        const blockDate = new Date(blockData.date);
-
-        if (blockDate >= startOfWeek && blockDate <= endOfWeek) {
-            const event = blockData.event;
-            const eventDuration = blockData.duration || 10; // Default to 10 minutes if no duration
-
-            eventTimes[event] = (eventTimes[event] || 0) + eventDuration;
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            updateWeekDisplay();
+        } else {
+            console.error("User not logged in.");
         }
     });
 
-    // Update chart with new data
-    updateChart(eventTimes);
-};
+    async function loadWeeklyData(startDate, endDate) {
+        const user = auth.currentUser;
+        if (!user) return;
 
-// Function to update the chart
-const updateChart = (eventTimes) => {
-    const labels = Object.keys(eventTimes);
-    const data = Object.values(eventTimes);
+        let eventCounts = {};
+        let eventColors = {};
+        let totalAssignedBlocks = 0;
+        const totalWeeklyBlocks = 144 * 7; // 144 blocks per day * 7 days
 
-    if (chart) {
-        chart.destroy();
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const formattedDate = d.toISOString().split('T')[0];
+            const blocksRef = collection(db, "users", user.uid, "assignedBlocks", formattedDate, "blocks");
+            const querySnapshot = await getDocs(blocksRef);
+
+            querySnapshot.forEach(doc => {
+                const { event, color } = doc.data();
+                if (event) {
+                    if (!eventCounts[event]) {
+                        eventCounts[event] = 0;
+                        eventColors[event] = color;
+                    }
+                    eventCounts[event] += 1;
+                    totalAssignedBlocks++;
+                }
+            });
+        }
+
+        // Calculate unassigned blocks
+        const unassignedBlocks = totalWeeklyBlocks - totalAssignedBlocks;
+        eventCounts["Unassigned"] = unassignedBlocks;
+        eventColors["Unassigned"] = "#d3d3d3";
+
+        console.log("Weekly Event Counts:", eventCounts);
+        renderBarChart(eventCounts, eventColors);
     }
 
-    chart = new Chart(analysisChartCanvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Time spent on each event (minutes)',
-                data: data,
-                borderColor: 'rgb(75, 192, 192)',
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: { title: { display: true, text: 'Event' } },
-                y: { title: { display: true, text: 'Minutes' }, beginAtZero: true }
+    function renderBarChart(eventCounts, eventColors) {
+        const ctx = document.getElementById("eventChart").getContext("2d");
+        if (barChart) barChart.destroy(); // Destroy previous chart
+
+        barChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: Object.keys(eventCounts),
+                datasets: [{
+                    label: "Time Spent (hours)",
+                    data: Object.values(eventCounts).map(count => (count * 10) / 60), // Convert to hours
+                    backgroundColor: Object.keys(eventCounts).map(event => eventColors[event] || "#888"),
+                    borderColor: "#000",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "Hours" }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
             }
-        }
-    });
-};
-
-// Handle authentication state change
-onAuthStateChanged(auth, user => {
-    console.log(user ? `User logged in: ${user.uid}` : "No user logged in");
+        });
+    }
 });

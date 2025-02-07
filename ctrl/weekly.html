@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.8">
-    <title>Weekly Analysis</title>
-    <link rel="stylesheet" href="css/analysis.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Analysis | CTRL Dashboard</title>
+    <link rel="stylesheet" href="css/weekly.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
     <header class="header">
         <div class="logo">CTRL.</div>
+        <div class="nav-bar">
+            <button class="weekly">WEEKLY</button>
+            <a href="analysis.html"><button class="daily">DAILY</button></a>
+        </div>
         <div class="icons">
-            <a href="weekly.html"><button class="weekly-button">WEEKLY</button></a>
-            <button class="daily-button">DAILY</button>
+                <a href="todo.html"><button class="todo-button">TO-DO</button></a>
+                <a href="coldturkey.html"><button class="coldturkey-button" id="coldturkey">COLD-TURKEY</button></a>
+                <script src="coldturkey.js"></script>
+                <a href="analysis.html"><button class="analysis-button">ANALYSIS</button></a>
+                <a href="login.html"><button class="logout-button">LOG OUT</button></a>
         </div>
     </header>
-
-    <select id="week-picker">
-        <option value="2025-02">Week 1 - February 2025</option>
-        <option value="2025-03">Week 2 - February 2025</option>
-        <!-- Add more options here -->
-    </select>
-
-    <canvas id="analysis-chart"></canvas>
-
+    <div class="controls">
+        <button id="prev-week">&lt;</button>
+        <p id="current-week"></p>
+        <button id="next-week">&gt;</button>
+    </div>
+    <div class="chart"> <canvas id="eventChart"></canvas> </div>
+    <a href="main.html">Back to main page</a>
     <script type="module" src="javascript/weekly.js"></script>
-</body>
 
+</body>
 </html>

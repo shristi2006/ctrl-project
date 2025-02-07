@@ -41,13 +41,6 @@ body {
     color: black;
 }
 
-.quote {
-    font-style: italic;
-    margin: 10px 0;
-    font-size: 20px;
-    color: #666;
-}
-
 .date-nav {
     display: flex;
     justify-content: center;
