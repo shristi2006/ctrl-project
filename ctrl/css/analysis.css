@@ -5,7 +5,6 @@ body {
     margin: 0;
     padding: 20px;
 }
-
 .header {
     display: flex;
     justify-content: space-between;
@@ -18,13 +17,12 @@ body {
     font-weight: bold;
 }
 
-.icons {
+.icons, .nav-bar {
     display: flex;
     gap: 10px;
 }
 
-.weekly-button,
-.daily-button {
+.todo-button, .coldturkey-button, .analysis-button, .logout-button, .weekly, .daily {
     padding: 10px 20px;
     border: none;
     cursor: pointer;
@@ -33,13 +31,12 @@ body {
     border: 2px solid black;
 }
 
-.daily-button,
-.weekly-button {
+.todo-button,.coldturkey-button,.logout-button, .weekly {
     background-color: black;
     color: white;
 }
 
-.weekly-button {
+.analysis-button, .daily{
     background-color: white;
     color: black;
 }

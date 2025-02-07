@@ -2,15 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
   <title>Cold Turkey Mode</title>
-  <link rel="stylesheet" href="coldturkey.css">
+  <link rel="stylesheet" href="css/coldturkey.css">
 </head>
 <body>
-    
+  <header class="header">
+        <div class="logo">CTRL.</div>
+        <div class="icons">
+            <a href="todo.html"><button class="todo-button">TO-DO</button></a>
+            <a href="coldturkey.html"><button class="coldturkey-button" id="coldturkey">COLD-TURKEY</button></a>
+            <script src="coldturkey.js"></script>
+            <a href="analysis.html"><button class="analysis-button">ANALYSIS</button></a>
+            <a href="login.html"><button class="logout-button">LOG OUT</button></a>
+        </div>
+    </header>  
   <div id="timer-container">
     <div id="timer-box">
-      <img src="time.png" alt="Timer Image" id="timer-image">
+      <img src="images/time.png" alt="Timer Image" id="timer-image">
       <div id="time-display">00:00:00</div>
       <input type="number" id="set-hours" placeholder="Hours" min="0">
       <input type="number" id="set-minutes" placeholder="Minutes" min="0" max="59">
@@ -20,10 +29,10 @@
     </div>
   </div>
 
-  <img id="end-image" src="celebrates.png" alt="Time over!" style="display: none;">
+  <img id="end-image" src="images/celebrates.png" alt="Time over!" style="display: none;">
 
   
-
-  <script src="coldturkey.js"></script>
+  <a href="main.html">Back to main page</a>
+  <script src="javascript/coldturkey.js"></script>
 </body>
 </html>

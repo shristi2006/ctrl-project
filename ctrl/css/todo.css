@@ -1,14 +1,45 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f8f8f8;
     margin: 0;
-    padding: 0;
+    padding: 20px;
+}
+.header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    height: 100vh;
+    padding: 10px 20px;
 }
 
+.logo {
+    font-size: 55px;
+    font-weight: bold;
+}
+
+.icons {
+    display: flex;
+    gap: 10px;
+}
+
+.todo-button, .coldturkey-button, .analysis-button, .logout-button {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px;
+    border: 2px solid black;
+}
+
+.analysis-button,.coldturkey-button,.logout-button {
+    background-color: black;
+    color: white;
+}
+
+.todo-button {
+    background-color: white;
+    color: black;
+}
 .container {
     background-color: white;
     border-radius: 8px;
