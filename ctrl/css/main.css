@@ -6,11 +6,13 @@ body {
     padding: 20px;
 }
 
+/* Header */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
+    flex-wrap: wrap;
 }
 
 .logo {
@@ -18,9 +20,11 @@ body {
     font-weight: bold;
 }
 
+/* Responsive Icon Container */
 .icons {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .todo-button, .coldturkey-button, .analysis-button, .logout-button {
@@ -32,9 +36,14 @@ body {
     border: 2px solid black;
     background-color: black;
     color: white;
+    transition: 0.3s ease-in-out;
 }
 
+.todo-button:hover, .coldturkey-button:hover, .analysis-button:hover, .logout-button:hover {
+    background-color: #444;
+}
 
+/* Quote Section */
 .quote {
     font-style: italic;
     margin: 10px 0;
@@ -42,11 +51,14 @@ body {
     color: #666;
 }
 
+/* Date Navigation */
 .date-nav {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 20px 0;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .prev-date, .next-date {
@@ -69,6 +81,7 @@ body {
     margin: 0 10px;
 }
 
+/* Main Grid */
 .grid {
     display: flex;
     flex-direction: column;
@@ -106,10 +119,10 @@ body {
 }
 
 .highlighted {
-    background-color: grey; 
+    background-color: grey;
 }
 
-/* Popup for event selection */
+/* Popup for Event Selection */
 .event-popup {
     display: none;
     position: absolute;
@@ -121,6 +134,7 @@ body {
     border-radius: 5px;
 }
 
+/* Event Popup Buttons */
 .event-popup button {
     display: block;
     width: 100%;
@@ -136,6 +150,7 @@ body {
     opacity: 0.8;
 }
 
+/* Event Creation */
 .event-creation {
     margin-top: 20px;
     display: flex;
@@ -178,12 +193,13 @@ body {
     font-size: 14px;
 }
 
+/* Event Container */
 #events-container {
     display: flex;
     gap: 10px;
     margin-top: 10px;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 .event-button {
@@ -194,6 +210,8 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
+/* Event Edit Popup */
 .event-edit-popup {
     position: fixed;
     top: 50%;
@@ -228,14 +246,37 @@ body {
 #cancel-event-edit {
     background-color: #dc3545;
     color: white;
-} 
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .logo {
+        font-size: 48px;
+    }
+
+    .todo-button, .coldturkey-button, .analysis-button, .logout-button {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+
+    .current-date {
+        font-size: 22px;
+    }
+}
+
 @media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
     .logo {
         font-size: 40px;
     }
 
-    button {
-        font-size: 14px;
+    .icons {
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
     .quote {
@@ -248,5 +289,46 @@ body {
 
     .current-date {
         font-size: 20px;
+        padding: 6px 12px;
+    }
+
+    .grid {
+        max-width: 95%;
+    }
+
+    .event-button {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 32px;
+    }
+
+    .todo-button, .coldturkey-button, .analysis-button, .logout-button {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    .prev-date, .next-date {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .current-date {
+        font-size: 18px;
+        padding: 5px 10px;
+    }
+
+    .time-grid th, .time-grid td {
+        font-size: 12px;
+        padding: 5px;
+    }
+
+    .event-button {
+        font-size: 14px;
+        padding: 8px 16px;
     }
 }

@@ -1,119 +1,155 @@
+
 body {
     font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f8f8f8;
     margin: 0;
-    padding: 0;
+    padding: 20px;
 }
+
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    
+}
+
+h1 {
+    font-size: 55px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    gap: 10px;
 }
 
 nav button {
+    padding: 10px 20px;
     border: none;
-    padding: 10px 15px;
     cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px;
+    border: 2px solid black;
+    background-color: black;
+    color: white;
 }
 
-.active {
+nav button.active {
     background: white;
     color: black;
 }
 
+/* Main Layout */
 main {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 20px;
     padding: 20px;
+    flex-wrap: wrap;
 }
 
-.weekly-goals, .tasks, .notes {
+
+.tasks, .notes {
     background: white;
-    border: 1px solid black;
+    border: 2px solid black;
     padding: 15px;
     border-radius: 8px;
-    width: 30%;
-    overflow-y: auto; /* Enable vertical scrolling */
+    width: 45%;
+    min-width: 300px;
+    overflow-y: auto; /* Enable scrolling */
     max-height: 500px; /* Limit height */
-}
-
-
-.note {
-    width: 200px;
-    height: 150px;
-    overflow-y: auto;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    padding: 10px;
-    border: 1px solid #ccc;
-    position: relative;
-}
-
-/* Adjust delete button positioning */
-.delete-note {
-    position: absolute;
-    top: 3px;
-    right: 3px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 22px;
 }
+
 
 .add {
     font-size: 18px;
     cursor: pointer;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 5px 10px;
 }
 
-.progress-container {
-    background: lightgray;
-    height: 8px;
-    border-radius: 4px;
-    margin-top: 5px;
-}
-
-.progress {
-    height: 8px;
-    border-radius: 4px;
-}
 
 .tasks ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .tasks li {
     display: flex;
-    align-items: left;
     justify-content: space-between;
-    padding: 8px 0;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid #ddd;
 }
 
+/* Priority Styling */
 .priority.high {
     background: red;
     color: white;
-    padding: 2px 5px;
+    padding: 4px 8px;
     border-radius: 3px;
 }
 
 .priority.medium {
     background: yellow;
-    padding: 2px 5px;
+    padding: 4px 8px;
     border-radius: 3px;
 }
 
 .priority.low {
     background: greenyellow;
-    padding: 2px 5px;
+    padding: 4px 8px;
     border-radius: 3px;
 }
+
 
 .notes-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    padding-top: 10px;
+}
+
+.delete-note {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 3px 6px;
+    cursor: pointer;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 40px;
+    }
+
+    button {
+        font-size: 14px;
+    }
+
+    .tasks,.notes {
+        width: 90%;
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }

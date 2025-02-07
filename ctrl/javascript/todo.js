@@ -50,90 +50,7 @@ onAuthStateChanged(auth, async (user) => {
         console.log('User not logged in');
     }
 });
-
-
-
-//goals------------------------------------------------------------------------------------------------------------------------------
-async function loadGoals() {
-    if (!userId) return;
-    const querySnapshot = await getDocs(goalsRef);
-    querySnapshot.forEach((doc) => {
-        addGoalToUI(doc.data(), doc.id);
-    });
-}
-
-function addGoalToUI(goalData, goalId) {
-    const goalsContainer = document.querySelector(".weekly-goals");
-    if (!goalsContainer) return;
-
-    const goalDiv = document.createElement("div");
-    goalDiv.classList.add("goal");
-    goalDiv.style.position = "relative";
-    goalDiv.innerHTML = `
-        <p>${goalData.hours} hours of <span class="tag">${goalData.event}</span></p>
-        <div class="progress-container"><div class="progress" style="width: 50%;"></div></div>
-    `;
-
-    // Add delete button
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "✖";
-    deleteBtn.classList.add("delete-goal");
-    deleteBtn.style.position = "absolute";
-    deleteBtn.style.top = "5px";
-    deleteBtn.style.right = "5px";
-    deleteBtn.addEventListener("click", async () => {
-        await deleteDoc(doc(db, 'users', userId, 'weeklygoals', goalId));
-        goalDiv.remove();
-    });
-
-    goalDiv.appendChild(deleteBtn);
-
-    // Insert below the heading, not replacing it
-    goalsContainer.appendChild(goalDiv);
-}
-
-
-async function loadEvents() {
-    if (!userId) return;
-    const querySnapshot = await getDocs(eventsRef);
-    const eventList = document.getElementById("goal-event");
-    if (!eventList) return; // Prevent errors if dropdown is missing
-    eventList.innerHTML = "";
-    querySnapshot.forEach((doc) => {
-        const option = document.createElement("option");
-        option.value = doc.data().name;
-        option.textContent = doc.data().name;
-        eventList.appendChild(option);
-    });
-}
-
-function showGoalInputBox() {
-    const goalSection = document.querySelector(".weekly-goals");
-    if (!goalSection) return console.error("Goals section not found");
-
-    const inputBox = document.createElement("div");
-    inputBox.classList.add("goal-input-box");
-    inputBox.innerHTML = `
-        <input type="number" id="goal-hours" placeholder="Hours">
-        <select id="goal-event"></select>
-        <button id="add-goal">Add</button>
-    `;
-    goalSection.prepend(inputBox);
-    loadEvents(); // Ensure dropdown exists before calling
-
-    document.getElementById("add-goal").addEventListener("click", async () => {
-        const hours = document.getElementById("goal-hours").value;
-        const event = document.getElementById("goal-event").value;
-        if (hours && event) {
-            const goalData = { hours, event, createdAt: new Date().toISOString() };
-            const goalDocRef = await addDoc(goalsRef, goalData);
-            addGoalToUI(goalData, goalDocRef.id); // Fix missing goalId
-        }
-        inputBox.remove();
-    });
-}
-
-//tasks---------------------------------------------------------------------------------------------------------------------
+//tasks
 async function loadTasks() {
     if (!userId) return;
     const querySnapshot = await getDocs(tasksRef);
@@ -141,6 +58,7 @@ async function loadTasks() {
         addTaskToUI(doc.data(), doc.id);
     });
 }
+
 
 function showTaskInputBox() {
     const taskSection = document.querySelector(".tasks");
@@ -182,30 +100,42 @@ function addTaskToUI(taskData, taskId) {
     if (!todoList) return console.error("Tasks list not found");
 
     const li = document.createElement("li");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
+    li.classList.add("task-item");
     if (taskData.completed) {
-        checkbox.checked = true;
         li.classList.add("completed");
     }
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = taskData.completed;
     checkbox.addEventListener("change", async function () {
-        await deleteDoc(doc(db, 'users', userId, 'tasks', taskId));
-        li.remove();
+        await setDoc(doc(db, 'users', userId, 'tasks', taskId), { completed: this.checked }, { merge: true });
+        li.classList.toggle("completed", this.checked);
     });
 
     const priorityTag = document.createElement("span");
     priorityTag.textContent = taskData.priority.toUpperCase();
     priorityTag.classList.add("priority", taskData.priority);
 
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "✖";
+    deleteBtn.classList.add("delete-task");
+    deleteBtn.addEventListener("click", async () => {
+        await deleteDoc(doc(db, 'users', userId, 'tasks', taskId));
+        li.remove();
+    });
+
     li.appendChild(checkbox);
-    li.appendChild(document.createTextNode(`${taskData.text} `));
+    li.appendChild(document.createTextNode(` ${taskData.text} `));
     li.appendChild(priorityTag);
+    li.appendChild(deleteBtn);
     todoList.prepend(li);
 }
 
 
 
-//notes-----------------------------------------------------------------------------------------------------------------------------
+
+//notes
 
 async function loadNotes() {
     if (!userId) return;
