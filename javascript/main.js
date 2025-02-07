@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // creating and deleting an event
+    // creating and deleting an event----------------------------------------------------------------------------------------------------
     const newEventBtn = document.getElementById("new-event-btn");
     const newEventForm = document.getElementById("new-event-form");
     const createEventBtn = document.getElementById("create-event-btn");
@@ -242,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     eventDiv.remove();
                 }
             });
-            loadUserEvents(userId);
         } catch (error) {
             console.error("Error deleting event:", error);
         }
@@ -259,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    //selection of blocks
+    //selection of blocks--------------------------------------------------------------------------------------------------------------------
     let isMouseDown = false;
     let selectedBlocks = new Set();
     let startBlockIndex = null;
@@ -324,7 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // Event popup for assigning events to blocks
+    // Event popup for assigning events to blocks---------------------------------------------------------------------------------
     const eventPopup = document.createElement('div');
     eventPopup.classList.add('event-popup');
     document.body.appendChild(eventPopup);

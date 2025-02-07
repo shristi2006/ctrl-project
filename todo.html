@@ -1,36 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CTRL Dashboard</title>
     <link rel="stylesheet" href="css/todo.css">
 </head>
+
 <body>
-    <header>
-        <h1>CTRL.</h1>
-        <nav>
-            <button class="active">TO-DO</button>
-            <a href="coldturkey.html"><button>COLD TURKEY</button></a>
-            <a href="daily-analysis.html"><button>ANALYSIS</button></a>
-            <a href="login.html"><button>LOG OUT</button></a>
-        </nav>
+    <!-- top navigation bar -->
+    <header class="header">
+        <div class="logo">CTRL.</div>
+        <div class="icons">
+            <a href="todo.html"><button class="todo-button">TO-DO</button></a>
+            <a href="coldturkey.html"><button class="coldturkey-button" id="coldturkey">COLD-TURKEY</button></a>
+            <a href="daily-analysis.html"><button class="analysis-button">ANALYSIS</button></a>
+            <a href="login.html"><button class="logout-button">LOG OUT</button></a>
+        </div>
     </header>
-    <!-- todo section  -->
+
+
     <main>
-        <section class="tasks">
-            <h2>TASKS <button class="add">+</button></h2>
-            <ul>
-                
-            </ul>
-        </section>
-    <!--  notes section -->    
-        <section class="notes">
-            <h2>NOTES <button class="add">+</button></h2>
-            <div class="notes-grid"></div>
-        </section>
+        <!-- todo section  -->
+        <div>
+            <p>TASKS</p>
+            <button id="add-task" class="add">+</button>
+            <section class="tasks">
+                <ul>
+                </ul>
+            </section>
+        </div>
+        <!--  notes section -->
+        <div>
+            <p>NOTES</p>
+            <button id="add-note" class="add">+</button>
+            <section class="notes">
+                <div class="notes-grid"></div>
+            </section>
+        </div>
     </main>
     <a href="main.html">Back to main page</a>
     <script type="module" src="javascript/todo.js"></script>
 </body>
+
 </html>

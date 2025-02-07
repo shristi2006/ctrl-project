@@ -35,8 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     nextDateBtn.addEventListener('click', () => {
+        if (currentDate < maxDate) {
         selectedDate.setDate(selectedDate.getDate() + 1);
         updateDateDisplay();
+        }
     });
 
     onAuthStateChanged(auth, user => {

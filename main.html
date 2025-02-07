@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <title>CTRL Dashboard</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body>
     <!-- links to access different features  -->
     <header class="header">
@@ -13,7 +15,6 @@
         <div class="icons">
             <a href="todo.html"><button class="todo-button">TO-DO</button></a>
             <a href="coldturkey.html"><button class="coldturkey-button" id="coldturkey">COLD-TURKEY</button></a>
-            <script src="coldturkey.js"></script>
             <a href="daily-analysis.html"><button class="analysis-button">ANALYSIS</button></a>
             <a href="login.html"><button class="logout-button">LOG OUT</button></a>
         </div>
@@ -25,14 +26,14 @@
 
     <nav class="date-nav">
         <button class="prev-date" id="prev-date">&lt;</button>
-        <button class="current-date" id="current-date" ></button>
-        <button class="next-date" id="next-date" >&gt;</button>
+        <button class="current-date" id="current-date"></button>
+        <button class="next-date" id="next-date">&gt;</button>
     </nav>
 
     <main class="grid">
         <div id="blocks-container"></div>
     </main>
- <!-- creating events  -->
+    <!-- creating events  -->
     <section class="event-creation">
         <button id="new-event-btn">New Event</button>
         <form id="new-event-form" style="display: none;">
@@ -49,4 +50,5 @@
     <!-- Load JavaScript at the end to ensure the DOM is ready -->
     <script type="module" src="javascript/main.js"></script>
 </body>
+
 </html>

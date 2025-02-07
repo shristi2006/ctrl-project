@@ -1,7 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background: #f8f8f8;
+  background: black;
   margin: 0;
   padding: 20px;
 }
@@ -10,6 +10,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: white;
   padding: 10px 20px;
 }
 
@@ -29,16 +30,21 @@ body {
   cursor: pointer;
   border-radius: 5px;
   font-size: 18px;
-  border: 2px solid black;
 }
  .coldturkey-button {
   background-color: white;
   color: black;
+  border: 2px solid black;
 }
 
 
-.todo-button, .analysis-button,.logout-button, .start-timer {
+.todo-button, .analysis-button,.logout-button {
   background-color: black;
+  color: white;
+  border: 2px solid white;
+}
+.start-timer {
+  background-color: grey;
   color: white;
 }
 #timer-container {
@@ -53,7 +59,8 @@ body {
 
 #timer-box {
   position: relative;
-  background: #f8f8f8;
+  background: #222;
+  color: white;
   padding: 40px;
   border-radius: 10px;
   display: inline-block;
@@ -86,7 +93,7 @@ button:hover {
 
 #block-message {
   display: none;
-  color: red;
+  color: greenyellow;
   font-size: 18px;
   margin-top: 20px;
 }

@@ -230,23 +230,11 @@ body {
     flex-direction: column;
     gap: 10px;
 }
-
-#save-event-edit, #cancel-event-edit {
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.event-popup {
+    max-height: 200px;
+    overflow-y: auto; 
 }
 
-#save-event-edit {
-    background-color: #28a745;
-    color: white;
-}
-
-#cancel-event-edit {
-    background-color: #dc3545;
-    color: white;
-}
 
 /* Responsive Design */
 @media (max-width: 1024px) {
