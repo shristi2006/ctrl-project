@@ -17,7 +17,7 @@ document.addEventListener("fullscreenchange", handleFullScreenChange);
 
 // Initialize input fields (optional)
 hoursInput.value = 0;
-minutesInput.value = 0;
+minutesInput.value = 30;
 secondsInput.value = 0;
 
 function startTimer() {
@@ -36,7 +36,7 @@ function startTimer() {
         alert("Please enter a valid time greater than zero.");
         return;
     }
-
+// enter full screen mode when the timer starts 
     if (!isTimerRunning) {
         isTimerRunning = true;
         startButton.disabled = true;
@@ -75,7 +75,7 @@ function updateDisplay() {
     timeDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     remainingTime = totalSeconds; // Store remaining time for pause/resume
 }
-
+// when the timer is finished display the image for 4 seconds and then hide it 
 function timerFinished() {
     unblockPage();
     isTimerRunning = false;
@@ -108,7 +108,7 @@ function enterFullScreen() {
         });
     }
 }
-
+// timer will be paused if the user exits full screen mode 
 function handleFullScreenChange() {
     if (!document.fullscreenElement) {
         pauseTimer();

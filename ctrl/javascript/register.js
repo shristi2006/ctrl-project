@@ -1,3 +1,4 @@
+//import necessary firebase modules 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const submit = document.getElementById('submit');
     submit.addEventListener("click", function (event) {
         event.preventDefault();
-
+        // get user input values 
         const email = emailInput.value;
         const password = passwordInput.value;
 
@@ -30,8 +31,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 const user = userCredential.user;
                 document.getElementById('message').innerText = "Account Created. Login to continue";
+                // display success message to the user 
                 window.location.href = "login.html";
+                // redirect to login page 
             })
+            // handling errors during user creation
             .catch((error) => {
                 const errorMessage = error.message;
                 document.getElementById('message').innerText = "Invalid Credentials";
