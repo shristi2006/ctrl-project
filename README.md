@@ -3,6 +3,12 @@
 ## 📝 Overview  
 CTRL is a web application designed to help users track and optimize their daily activities to enhance focus and productivity.  
 
+
+https://github.com/user-attachments/assets/484c9205-693d-4a5f-bebe-ce6d3df3beb1
+
+
+
+
 ## 🚀 Features  
 - 🔐 **User Authentication** - Supports Email/Password & Google Login  
 - 📅 **144-Block Time Tracker** - Track daily activities in 10-minute slots  
